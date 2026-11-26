@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Fitness Kits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday-occasion: a product pitch to a co-founder, styled as a shop
+   IDEA a DTC brand storefront with a kit builder: pick options, watch the box change
+   PICTURE each kit slide is the store page itself: product tiles + live kit box
+   COLOUR white ground, near-black ink, one field per kit (oak, steel, blush), orange accent
+   TYPE Archivo 800 display + Inter text
+   LAYOUT deck of 5 slides scrolling sideways; tiles left, sticky detail/box right; stacks on phone */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#111214);--ink:light-dark(#141414,#f1f1ef);--mute:light-dark(#5d5d5a,#a8a8a3);--line:light-dark(#e4e2dd,#2b2c2f);--card:light-dark(#ffffff,#18191c);--acc:#ff5a1f;--home:light-dark(#e9dcc8,#3a3126);--lift:light-dark(#dfe3ea,#252a33);--life:light-dark(#f8dbe2,#3b2328);--ok:light-dark(#0c7a43,#5fd39a);--bad:light-dark(#c0221a,#ff8a7a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Archivo,Inter,sans-serif;letter-spacing:-.02em;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5vw,52px);font-weight:800}
+h2{font-size:clamp(28px,3.6vw,40px);font-weight:800}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,label:focus-within{outline:2px solid var(--acc);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px max(4vw,16px);border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.logo{font:800 20px Archivo,sans-serif;letter-spacing:-.02em}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav button{border:1px solid var(--line);background:none;border-radius:999px;padding:8px 14px;min-height:40px;font-size:14px}
+.nav button[aria-current=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;align-items:flex-start}
+.deck::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;padding:clamp(20px,3vw,44px) max(4vw,16px) 90px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
+.lead{font-size:17px;color:var(--mute);max-width:62ch;margin-top:12px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:8px}
+.kitcard{border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:10px;min-height:300px;border:0;text-align:left}
+.kitcard.home{background:var(--home)}.kitcard.lift{background:var(--lift)}.kitcard.life{background:var(--life)}
+.kitcard .big{font:800 clamp(26px,3vw,34px)/1.05 Archivo,sans-serif;letter-spacing:-.02em}
+.kitcard ul{margin:0;padding-left:18px;font-size:15px}
+.kitcard .go{margin-top:auto;font-weight:600}
+.rules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:6px}
+.rule{border-top:2px solid var(--ink);padding-top:10px;font-size:15px}
+.rule b{display:block;font-family:Archivo,sans-serif;font-size:17px;margin-bottom:4px}
+.kithead{border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:end;margin-bottom:18px}
+.kithead p{font-size:16px}
+.who{font-size:14px;color:var(--ink);opacity:.8}
+.sw{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1px var(--line)}
+.sw button[aria-pressed=true]{box-shadow:0 0 0 2px var(--ink)}
+.shop{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.grp{font:700 15px Archivo,sans-serif;margin:4px 0 10px;display:flex;justify-content:space-between;color:var(--mute)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.tile{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px;display:flex;flex-direction:column;gap:8px;text-align:left;transition:border-color .15s}
+.tile.sel{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.tile.off .ph{opacity:.45}
+.ph{aspect-ratio:4/3;border-radius:10px;background:var(--tint);display:grid;place-items:center;overflow:hidden;position:relative;font-size:13px;color:var(--ink)}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph span{opacity:.7}
+.tn{font-weight:600;font-size:15px;line-height:1.3}
+.tp{display:flex;justify-content:space-between;align-items:center;font-size:14px;gap:6px}
+.price{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--bg);white-space:nowrap}
+.add{font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid var(--ink);background:none;min-height:34px;white-space:nowrap}
+.add[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font-size:13px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:none;min-height:32px}
+.chips button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.side{position:sticky;top:84px;display:flex;flex-direction:column;gap:14px}
+.panel{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card)}
+.panel h3{margin-bottom:10px}
+.dl{display:grid;grid-template-columns:7.2em minmax(0,1fr);gap:8px 12px;font-size:15px}
+.dl dt{color:var(--mute)}.dl dd{margin:0}
+.box{background:var(--ink);color:var(--bg);border:0}
+.box .row{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3px 0}
+.box .total{font:800 40px/1 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 4px}
+.box ul{margin:8px 0;padding-left:18px;font-size:14px;opacity:.85}
+.m{font-weight:700}.box .m.ok{color:light-dark(#5fd39a,#0c7a43)}.box .m.bad{color:light-dark(#ff8a7a,#c0221a)}
+.note{font-size:13px;color:var(--mute);margin-top:8px}
+.upl{font-size:13px;color:var(--mute);display:inline-flex;gap:6px;align-items:center;cursor:pointer;text-decoration:underline}
+.upl input{position:absolute;opacity:0;width:1px;height:1px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600}
+.scroll{overflow-x:auto}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:18px}
+.step{border-radius:14px;padding:16px;background:var(--lift)}
+.step b{font-family:Archivo,sans-serif;font-size:20px;display:block}
+.pager{position:fixed;bottom:14px;right:max(4vw,16px);display:flex;gap:8px;z-index:6}
+.pager button{width:48px;height:48px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:20px}
+@media(max-width:900px){.shop{grid-template-columns:minmax(0,1fr)}.side{position:static}.rules,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.three{grid-template-columns:minmax(0,1fr)}.kitcard{min-height:0}.kithead{grid-template-columns:minmax(0,1fr)}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.rules,.steps{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:no-preference){.deck{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">Kit proposal · Maxime</div>
+  <nav class="nav" id="nav"></nav>
+</header>
+
+<main class="deck" id="deck">
+  <section class="slide" data-name="Concept">
+    <div class="hero">
+      <div>
+        <h1>Three kits, each one a complete training session</h1>
+        <p class="lead">Instead of loose accessories, every kit lets the buyer do a real workout the day it arrives. One product per function, a variant for each body and need, and add-ons on top. All three are designed like lifestyle objects people want to film and keep on display.</p>
+      </div>
+      <div class="three" id="overview"></div>
+      <div class="rules">
+        <div class="rule"><b>One function, one product</b>No two items doing the same job. Duplicates become variants the buyer picks.</div>
+        <div class="rule"><b>Variants by need</b>Hands that blister, weak grip, heavy lifts: each problem gets its own version.</div>
+        <div class="rule"><b>Bundles carry the weak items</b>Sweatbands, sliders and tubes lose money alone. In one parcel with a hero they become profit.</div>
+        <div class="rule"><b>Heavy items stay optional</b>Ab roller, pull-up bar and big bag go as add-ons or US-warehouse items so the base parcel stays light.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-name="Home kit" data-kit="home"></section>
+  <section class="slide" data-name="Lifting kit" data-kit="lift"></section>
+  <section class="slide" data-name="Lifestyle kit" data-kit="life"></section>
+
+  <section class="slide" data-name="Checks & next">
+    <h2>How the kits pass the section 8 checks</h2>
+    <p class="lead">What the bundle fixes, and what still has to be verified with suppliers on Friday and Saturday.</p>
+    <div class="scroll" style="margin-top:18px">
+      <table>
+        <thead><tr><th>Consideration</th><th>Home full body</th><th>Lifting kit</th><th>Lifestyle kit</th></tr></thead>
+        <tbody>
+          <tr><td>Manufacturer availability</td><td>All items common on CJ / Alibaba. Pull-up bar only if AutoDS has US stock.</td><td>Very common. Check the figure-8 and silicone quality on samples.</td><td>Tote and socks easy. Ballerina socks: cost in our sheet looks wrong, recheck.</td></tr>
+          <tr><td>Personalisation</td><td>Colour-coded tubes, logo pedal, wood-tone or stone colourway.</td><td>Embossed logo, woven labels, unisex colourways.</td><td>The strongest: prints, colourways, branded tote.</td></tr>
+          <tr><td>Shipping</td><td>Ab roller costs about $28 to ship: option only, or lighter model.</td><td>Tiny and light. Gym bag goes as an add-on.</td><td>Light. Big bag as the heavy alternative.</td></tr>
+          <tr><td>Profitability</td><td>Sliders and tubes fail alone, pass inside the kit. Essential about 34%, Premium about 39%.</td><td>Core grip + strap about 35%; about 40% with the ankle-strap add-on.</td><td>Socks carry the sweatbands and tote.</td></tr>
+          <tr><td>Demand</td><td>Home training, no gym access, remote workers.</td><td>Lifting straps around 41k searches a week (Jan 2026).</td><td>Pilates / grip socks up 51% year on year on Amazon.</td></tr>
+          <tr><td>Competition</td><td>Many generic sets; we win on design and a full-session guide.</td><td>Crowded; we win on fit-by-problem variants.</td><td>Brand-led; we win on look.</td></tr>
+          <tr><td>Bundle compatibility</td><td>Every item has its place in one full-body session.</td><td>Ankle straps (add-on) also clip on the home tubes and link to the Glute bundle.</td><td>Socks also work for deadlifts in the gym.</td></tr>
+          <tr><td>Return risk</td><td>Low. Check tube durability.</td><td>Sizing on grips: needs a size guide.</td><td>Sock sizing: size guide.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="steps">
+      <div class="step"><b>Thursday</b>Agree the three kits and their options with Khushi.</div>
+      <div class="step"><b>Friday</b>Learn manufacturer sourcing with Khushi.</div>
+      <div class="step"><b>Saturday</b>Start sourcing, one supplier per function, same warehouse if possible.</div>
+      <div class="step"><b>End of November</b>Manufacturers found, samples ordered. Launch target: mid-December.</div>
+    </div>
+    <p class="note">Margins are estimates: kit price = 85% of the items' prices, one parcel (heaviest item's shipping + 30% of the others), $2 packaging, 37.5% US duty on cost, Shopify fees and 5% refunds, as in our Product Research Tool. Items marked "est." use web prices, to confirm on CJ / AutoDS.</p>
+  </section>
+</main>
+
+<div class="pager"><button id="prev" aria-label="Previous slide">‹</button><button id="next" aria-label="Next slide">›</button></div>
+
+<script>
+{
+const P=(n,price,cost,ship,est,what,who,brand,note)=>({n,price,cost,ship,est:!!est,what,who,brand,note:note||''});
+const KITS={
+home:{name:'Home full body',tint:'var(--home)',swatches:[['Oak','#c9a77c'],['Stone','#b9b6ad'],['Onyx','#1d1d1d']],
+ tiers:[['Essential',[]],['Premium',['pushboard']]],
+ idea:'The whole gym session at home: legs, push, pull, core and cardio. Two editions: Essential, and Premium with the push-up board. Designed like a decor object, so it looks good on camera, in the living room or next to a desk.',
+ who:'People with no gym access, remote workers, digital nomads, anyone who wants to train like at the gym without leaving home.',
+ groups:[
+  {t:'In the kit: pick your resistance',core:true,items:[
+   {id:'res',v:[P('Resistance tube set + door anchor',24.99,5,8,1,'Five stackable tubes, handles, door anchor and ankle straps. Anchored at the feet, the door (high, middle, low) and the ankles: chest press, lat pulldown, face pulls, triceps, rows, legs, glutes. The full gym replacement and the entry product people search for.','Intermediate and up, people replacing the gym.','Tubes colour-coded in our palette, branded pouch, printed session card with a QR to the workout.'),
+    P('Pedal / sit-up trainer',19.99,2.07,7,0,'The simple version: one piece, ready in two seconds, no door needed. Rows, curls, shoulder press and sit-ups with the feet held. Fewer exercises and fixed resistance compared with the tube set.','Beginners, travellers, ab-focused home workouts (a format that does well on TikTok).','Pedal and handles in the kit colourway, logo on the handles, branded tube sleeves.')]},
+   {id:'sliders',v:[P('Exercise sliders',9.99,1.58,7,0,'Core work, sliding push-ups for the push session, lunges and hamstring curls.','All levels.','Logo print, two-tone colourway, matching pouch.','Loses money alone (about −13%), works inside the kit.')]},
+   {id:'rope',v:[P('Cordless weighted jump rope',19.99,2.5,7,1,'The cardio block. Cordless means it works in an apartment without hitting the ceiling.','All levels, small spaces.','Handle colourway, embossed logo.')]}]},
+  {t:'Add-ons',items:[
+   {id:'abroller',v:[P('Smart ab roller',28.99,2.63,28.19,0,'Abs, with timer and rebound.','Core-focused buyers.','Colourway, logo on the wheel.','About $28 shipping: optional only, or find a lighter or US-stock model.')]},
+   {id:'pushboard',v:[P('Push-up board (Premium)',24.99,4,9,1,'The Premium upgrade. Precision for the push session: chest, shoulders, triceps by hand position. Adds to the sliders, does not replace them: sliders still cover core and legs. Doubles as a desk-style object.','Push-focused buyers, the "home office athlete".','Wood-tone or stone finish, minimal print instead of the usual colour codes.','Retail about $16–40. Check AutoDS for US stock.')]},
+   {id:'shaker',v:[P('Electric shaker bottle',27.99,3.19,9.96,0,'Protein after the session.','Everyone who takes protein.','Colourway, logo.')]},
+   {id:'griptrainer',v:[P('Grip trainer with counter',20.99,1.33,7,0,'Forearms at home, where there are no heavy dumbbells for hammer curls.','Home trainers, climbers.','Colourway, logo.')]},
+   {id:'pullbar',v:[P('Doorway pull-up bar',24.99,7,15,1,'Real pull-ups at home.','Intermediate trainers.','Foam grips in the colourway.','About 2.5–3 kg and 80+ cm long: only from a US warehouse.')]}]}]},
+lift:{name:'Lifting kit',tint:'var(--lift)',swatches:[['Steel','#7c8594'],['Onyx','#1d1d1d'],['Blush','#e8a6b6','ankle']],
+ idea:'Better holds than the gym\'s own equipment, matched to the body and the problem: calluses, weak grip, sweaty hands, heavy pulls. Two functions in the core: protect the hand, hold the bar. Neutral enough for any gym, branded and designed.',
+ who:'Gym members on a classic session (deadlift, rows, pulldowns). The Blush look suggests the glute add-on without labelling the kit; bags as an add-on so everything matches.',
+ groups:[
+  {t:'In the kit: one product per function, pick your version',core:true,items:[
+   {id:'hands',v:[
+    P('Silicone lifting grips',12.99,1.5,6,1,'Protects the palm from calluses, washable, very light.','Skin-conscious lifters; strong angle for women who do not want rough hands, and for beginners.','Soft colours, embossed logo, matching mini pouch.'),
+    P('Padded grip pads',14.99,3.5,7.6,1,'Cushion and grip on heavy dumbbells and bars, good with sweaty hands.','Regular and heavy lifters.','Woven logo label, unisex dark colourways.','Our sheet says $30; market is about $10–13, so priced at $14.99 here.')]},
+   {id:'hold',v:[
+    P('Padded lasso straps',19.99,2,7,1,'For every pulling movement: deadlift, rows, lat pulldown, shrugs, pull-ups. The grip stops failing before the back.','Beginners to advanced; easy to learn.','Printed strap, logo on the padding.'),
+    P('Figure-8 straps',23.99,1.65,7,0,'Maximum lock on heavy deadlifts and shrugs.','Experienced lifters. Not for Olympic lifts (cannot let go fast).','Logo tab, colourway.')]}]},
+  {t:'Add-ons',items:[
+   {id:'ankle',v:[P('Cable ankle straps',17.99,3.33,7,1,'Glute kickbacks, abductions and leg curls on the cable machine. Also clips onto the home tubes. Add-on, because a classic lifting session does not need it.','Glute and lower-body training, mostly women: suggested with the Blush look, never labelled.','Colourways, printed logo, sold as a pair.','Links with the Glute bundle (E) on Khushi\'s side.')]},
+   {id:'bag',v:[P('Gym bag with shoe compartment',45,15,10,0,'Carries the whole kit, shoes apart.','Everyone; the giftable version of the kit.','Matching colourway, embroidered logo.','18% margin alone, fine as an add-on.'),P('Mini gym tote',22.99,4,7,1,'Light version for the essentials.','Lifestyle-minded lifters.','Printed tote in the colourway.','Our sheet\'s cost ($44.79) is a wrong supplier match; estimate used.')]},
+   {id:'socks',v:[P('Grip socks',25,2.5,5,0,'Many lifters deadlift in socks: grip on the floor and a flat base.','Deadlift and Pilates crowd.','Colourways and textures, logo on the sole.')]},
+   {id:'sweat',v:[P('Gym sweatbands',8.99,0.88,7,0,'Keeps sweat off the hands and grip.','Everyone.','Embroidered logo.','Loses money alone; only as an add-on.')]},
+   {id:'shaker',v:[P('Electric shaker bottle',27.99,3.19,9.96,0,'Protein after the session.','Gym members.','Colourway, logo.')]},
+   {id:'rope',v:[P('Cordless weighted jump rope',19.99,2.5,7,1,'Warm-up or finisher; gyms already have the rest.','Everyone.','Handle colourway.')]}]}]},
+life:{name:'Lifestyle kit',tint:'var(--life)',swatches:[['Blush','#e8a6b6'],['Cream','#e9e1d3'],['Onyx','#1d1d1d']],
+ idea:'Where gym meets fashion: the pieces people show in their outfit and their videos. Neutral name, strong look, one design line for women and one for men.',
+ who:'Gym and Pilates-goers who care about style, content creators, gift buyers.',
+ groups:[
+  {t:'In the kit',core:true,items:[
+   {id:'bag',v:[P('Mini gym tote',22.99,4,7,1,'Carries socks, bands, phone and bottle; part of the outfit.','Style-first buyers.','Printed tote, colourways, the brand\'s most visible item.','Cost estimated; our sheet\'s match is wrong.'),P('Gym bag with shoe compartment',45,15,10,0,'For those who carry shoes and a change of clothes.','Daily gym-goers.','Matching colourway, embroidered logo.')]},
+   {id:'socks',v:[P('Grip socks',25,2.5,5,0,'Grip for Pilates, barre and deadlifts.','Pilates and gym crowd.','Colourways and textures, logo on the sole.'),P('Five-toe grip socks',16.99,1.4,5.23,0,'More balance and toe control.','Pilates and yoga regulars.','Colourways.'),P('Ballerina non-slip socks',11.99,8.26,3,0,'The barre look.','Barre classes.','Colourways, satin details.','Cost $8.26 in our sheet looks wrong: recheck before using.')]},
+   {id:'sweat',v:[P('Gym sweatbands',8.99,0.88,7,0,'Wrist and head bands as part of the look.','Everyone.','Embroidered logo, colourways.')]}]},
+  {t:'Add-ons',items:[
+   {id:'shaker',v:[P('Electric shaker bottle',27.99,3.19,9.96,0,'The bottle that goes with the bag.','Gym-goers.','Colourway, logo.')]},
+   {id:'rope',v:[P('Cordless weighted jump rope',19.99,2.5,7,1,'A cardio piece that looks good on camera.','Home and gym.','Handle colourway.')]}]}]}};
+
+const S={};
+for(const k in KITS){S[k]={on:{},v:{},sel:null,sw:0,tier:0,auto:null};KITS[k].groups.forEach(g=>g.items.forEach(it=>{S[k].v[it.id]=0;S[k].on[it.id]=!!g.core}));S[k].sel=KITS[k].groups[0].items[0].id}
+const photos={};
+try{Object.assign(photos,JSON.parse(localStorage.getItem('kitPhotos')||'{}'))}catch(e){}
+const usd=x=>'$'+x.toFixed(2);
+const solo=p=>{const t=p.cost+p.ship+1+.375*p.cost+.029*p.price+.3+.05*p.price;return (p.price-t)/p.price};
+const find=(k,id)=>{for(const g of KITS[k].groups)for(const it of g.items)if(it.id===id)return {g,it};};
+const kitCalc=k=>{const ps=[];KITS[k].groups.forEach(g=>g.items.forEach(it=>{if(S[k].on[it.id])ps.push(it.v[S[k].v[it.id]])}));
+ const full=ps.reduce((a,p)=>a+p.price,0),price=full*.85,cost=ps.reduce((a,p)=>a+p.cost,0);
+ const sh=ps.map(p=>p.ship).sort((a,b)=>b-a),ship=sh.length?sh[0]+.3*sh.slice(1).reduce((a,b)=>a+b,0):0;
+ const t=cost+ship+2+.375*cost+.029*price+.3+.05*price;return {ps,full,price,profit:price-t,m:price?(price-t)/price:0}};
+
+const slug=n=>n.toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const ph=(k,p)=>{const key=k+'|'+p.n;return photos[key]?`<img alt="${p.n}" src="${photos[key]}">`:`<img alt="${p.n}" src="img/${slug(p.n)}.jpg" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Photo to add'}))">`};
+const K_feat=k=>KITS[k].swatches[S[k].sw][2]||null;
+const tile=(k,g,it)=>{const p=it.v[S[k].v[it.id]],on=S[k].on[it.id],sel=S[k].sel===it.id;
+ return `<div class="tile${sel?' sel':''}${on?'':' off'}">
+  <button class="ph" style="border:0;padding:0" data-k="${k}" data-pick="${it.id}" aria-label="Show details for ${p.n}">${ph(k,p)}</button>
+  <button style="border:0;background:none;padding:0;text-align:left" class="tn" data-k="${k}" data-pick="${it.id}">${p.n}</button>
+  ${it.v.length>1?`<div class="chips">${it.v.map((x,i)=>`<button data-k="${k}" data-var="${it.id}" data-i="${i}" aria-pressed="${S[k].v[it.id]===i}">${x.n.replace(/ (lifting grips|grip pads|lasso straps|straps|grip socks|non-slip socks|with shoe compartment)$/i,'').replace('Mini gym tote','Tote').replace('Gym bag','Bag')}</button>`).join('')}</div>`:''}
+  <div class="tp"><span class="price">${usd(p.price)}${p.est?' est.':''}</span>${g.core?'<span class="tag">In kit</span>':K_feat(k)===it.id&&!on?'<button class="add" data-k="'+k+'" data-add="'+it.id+'" aria-pressed="false">+ Suggested</button>':`<button class="add" data-k="${k}" data-add="${it.id}" aria-pressed="${on}">${on?'Added':'+ Add'}</button>`}</div>
+ </div>`};
+
+const render=k=>{const K=KITS[k],sec=document.querySelector(`[data-kit=${k}]`),c=kitCalc(k),cur=find(k,S[k].sel),p=cur.it.v[S[k].v[cur.it.id]],sm=solo(p);
+ sec.style.setProperty('--tint',K.tint);
+ sec.innerHTML=`<div class="kithead" style="background:${K.tint}">
+   <div><h2>${K.name}</h2><p style="margin-top:10px">${K.idea}</p></div>
+   <div><p class="who"><b>Who it's for:</b> ${K.who}</p>
+   ${K.tiers?`<div class="chips" style="margin-top:12px"><span style="font-size:14px;align-self:center">Edition</span>${K.tiers.map((t,i)=>`<button data-k="${k}" data-tier="${i}" aria-pressed="${S[k].tier===i}">${t[0]}</button>`).join('')}</div>`:''}
+   <div class="sw" style="margin-top:12px"><span>Colourway</span>${K.swatches.map((s,i)=>`<button aria-label="${s[0]}" title="${s[0]}" data-k="${k}" data-sw="${i}" aria-pressed="${S[k].sw===i}" style="background:${s[1]}"></button>`).join('')}<span>${K.swatches[S[k].sw][0]}</span></div></div>
+  </div>
+  <div class="shop"><div>${K.groups.map(g=>`<div class="grp"><span>${g.t}</span></div><div class="tiles">${g.items.map(it=>tile(k,g,it)).join('')}</div>`).join('')}</div>
+  <aside class="side">
+   <div class="panel"><h3>${p.n}</h3>
+    <dl class="dl"><dt>What it does</dt><dd>${p.what}</dd><dt>Target</dt><dd>${p.who}</dd><dt>Branding</dt><dd>${p.brand}</dd>
+    <dt>Price</dt><dd class="price">${usd(p.price)}${p.est?' (web estimate)':''}</dd><dt>Margin alone</dt><dd><span class="m ${sm>=.3?'ok':'bad'}" style="color:var(--${sm>=.3?'ok':'bad'})">${Math.round(sm*100)}%</span> ${sm>=.3?'passes the 30% rule':'below 30%, needs the kit'}</dd></dl>
+    ${p.note?`<p class="note">${p.note}</p>`:''}
+    <label class="upl" style="margin-top:10px">Add a photo for this product<input type="file" accept="image/*" data-k="${k}" data-up="${p.n}"></label>
+   </div>
+   <div class="panel box"><h3>Your ${K.name.toLowerCase()}${K.tiers?' '+K.tiers[S[k].tier][0]:''} · ${K.swatches[S[k].sw][0]}</h3>
+    <ul>${c.ps.map(x=>`<li>${x.n}</li>`).join('')}</ul>
+    <div class="row"><span>Items bought separately</span><span class="price" style="text-decoration:line-through;opacity:.7">${usd(c.full)}</span></div>
+    <div class="total price">${usd(c.price)}</div>
+    <div class="row"><span>Estimated profit per kit</span><span class="price">${usd(c.profit)}</span></div>
+    <div class="row"><span>Estimated margin</span><span class="m ${c.m>=.3?'ok':'bad'}">${Math.round(c.m*100)}% ${c.m>=.3?'✓':'· under 30%'}</span></div>
+   </div>
+  </aside></div>`};
+
+const deck=document.getElementById('deck'),slides=[...deck.children],nav=document.getElementById('nav');
+nav.innerHTML=slides.map((s,i)=>`<button data-go="${i}">${s.dataset.name}</button>`).join('');
+document.getElementById('overview').innerHTML=Object.entries(KITS).map(([k,K],i)=>{const c=kitCalc(k);return `<button class="kitcard ${k}" data-go="${i+1}"><span class="big">${K.name}</span><span>${K.idea.split('.')[0]}.</span><ul>${c.ps.map(p=>`<li>${p.n}</li>`).join('')}</ul><span class="go">From ${usd(c.price)} · about ${Math.round(c.m*100)}% margin →</span></button>`}).join('');
+Object.keys(KITS).forEach(render);
+
+let idx=0;
+const go=i=>{idx=Math.max(0,Math.min(slides.length-1,i));slides[idx].scrollIntoView({block:'nearest',inline:'start'});mark()};
+const mark=()=>nav.querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-current',i===idx));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.6){idx=slides.indexOf(e.target);mark()}}),{root:deck,threshold:[.6]});
+slides.forEach(s=>io.observe(s));mark();
+document.getElementById('prev').onclick=()=>go(idx-1);
+document.getElementById('next').onclick=()=>go(idx+1);
+addEventListener('keydown',e=>{if(e.target.closest('input'))return;if(e.key==='ArrowRight')go(idx+1);if(e.key==='ArrowLeft')go(idx-1)});
+
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset,k=d.k;
+ if(d.go!==undefined){go(+d.go);return}
+ if(!k)return;
+ if(d.pick)S[k].sel=d.pick;
+ if(d.var){S[k].v[d.var]=+d.i;S[k].sel=d.var}
+ if(d.add){S[k].on[d.add]=!S[k].on[d.add];S[k].sel=d.add;if(S[k].auto===d.add)S[k].auto=null;
+  const T=KITS[k].tiers;if(T){const pi=T.findIndex(t=>t[1].includes(d.add));if(pi>=0)S[k].tier=S[k].on[d.add]?pi:0}}
+ if(d.tier!==undefined){const T=KITS[k].tiers;S[k].tier=+d.tier;T.forEach(t=>t[1].forEach(id=>S[k].on[id]=false));T[S[k].tier][1].forEach(id=>S[k].on[id]=true)}
+ if(d.sw!==undefined){if(S[k].auto){S[k].on[S[k].auto]=false;S[k].auto=null}S[k].sw=+d.sw;const f=K_feat(k);if(f&&!S[k].on[f]){S[k].on[f]=true;S[k].auto=f;S[k].sel=f}}
+ render(k);
+ document.getElementById('overview').innerHTML=Object.entries(KITS).map(([kk,K],i)=>{const c=kitCalc(kk);return `<button class="kitcard ${kk}" data-go="${i+1}"><span class="big">${K.name}</span><span>${K.idea.split('.')[0]}.</span><ul>${c.ps.map(p=>`<li>${p.n}</li>`).join('')}</ul><span class="go">From ${usd(c.price)} · about ${Math.round(c.m*100)}% margin →</span></button>`}).join('');
+});
+document.addEventListener('change',e=>{const f=e.target;if(!f.dataset.up||!f.files[0])return;const r=new FileReader();
+ r.onload=()=>{photos[f.dataset.k+'|'+f.dataset.up]=r.result;try{localStorage.setItem('kitPhotos',JSON.stringify(photos))}catch(err){}render(f.dataset.k)};r.readAsDataURL(f.files[0])});
+}
+</script>
+</body>
+</html>
